@@ -109,13 +109,13 @@ module CI
       # Compatibility with rspec < 1.2.4
       def add_example_group(example_group)
         @formatter.add_example_group(example_group)
-        new_suite(description_for(example_group))
+        new_suite(full_description_for(example_group))
       end
 
       # rspec >= 1.2.4
       def example_group_started(example_group)
         @formatter.example_group_started(example_group)
-        new_suite(description_for(example_group))
+        new_suite(full_description_for(example_group))
       end
       
       def example_group_finished(example_group)
@@ -190,12 +190,18 @@ module CI
       end
 
       private
-      def description_for(name_or_example)
+      def full_description_for(name_or_example)
         if name_or_example.respond_to?(:full_description)
           name_or_example.full_description
         elsif name_or_example.respond_to?(:metadata)
           name_or_example.metadata[:example_group][:full_description]
-        elsif name_or_example.respond_to?(:description)
+        else
+          description_for(name_or_example)
+        end
+      end
+
+      def description_for(name_or_example)
+        if name_or_example.respond_to?(:description)
           name_or_example.description
         else
           "UNKNOWN"
